@@ -1,0 +1,30 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "iconify-search",
+  "title": "Iconify Search",
+  "description": "Search and browse icons from the Iconify API.",
+  "dependencies": [
+    "@tanstack/react-query"
+  ],
+  "registryDependencies": [
+    "combobox"
+  ],
+  "files": [
+    {
+      "path": "registry/new-york/blocks/iconify-search/iconify-search.tsx",
+      "content": "\"use client\"\n\nimport * as React from \"react\"\nimport { useDeferredValue } from \"react\"\nimport {\n  Combobox,\n  ComboboxContent,\n  ComboboxEmpty,\n  ComboboxGroup,\n  ComboboxInput,\n  ComboboxItem,\n  ComboboxLabel,\n  ComboboxList,\n  ComboboxCollection,\n} from \"@/components/ui/combobox\"\nimport { useIconifySearch } from \"@/hooks/use-iconify-search\"\nimport { getIconUrl, type IconifySearchResponse } from \"@/lib/iconify\"\nimport { cn } from \"@/lib/utils\"\n\n/** Derive groups from raw search API response for combobox display */\nfunction getGroupsFromSearchResponse(\n  data: IconifySearchResponse | null | undefined\n): { value: string; label: string; items: string[] }[] {\n  if (!data?.icons?.length) return []\n\n  const groups = new Map<string, { label: string; items: string[] }>()\n\n  for (const iconId of data.icons) {\n    const [prefix, name] = iconId.split(\":\")\n    if (!prefix || !name) continue\n\n    const collection = data.collections[prefix]\n    const label = collection?.name ?? prefix\n\n    const existing = groups.get(prefix)\n    if (existing) {\n      existing.items.push(iconId)\n    } else {\n      groups.set(prefix, { label, items: [iconId] })\n    }\n  }\n\n  return Array.from(groups.entries()).map(([value, { label, items }]) => ({\n    value,\n    label,\n    items,\n  }))\n}\n\nexport function IconifySearch(): React.ReactElement | null {\n  const [query, setQuery] = React.useState(\"\")\n  const deferredQuery = useDeferredValue(query)\n  const { data, isLoading } = useIconifySearch(deferredQuery)\n\n  const groups = React.useMemo(\n    () => getGroupsFromSearchResponse(data),\n    [data]\n  )\n\n  return (\n    <div className=\"w-full min-w-[280px]\">\n      <Combobox\n        items={groups}\n        itemToStringValue={(iconId: string) => iconId}\n        itemToStringLabel={(iconId: string) => iconId.split(\":\")[1] ?? iconId}\n        filteredItems={groups}\n        filter={null}\n        inputValue={query}\n        onInputValueChange={setQuery}\n      >\n        <ComboboxInput placeholder=\"Search icons...\" showClear={!!query} />\n        <ComboboxContent>\n          <ComboboxEmpty>\n            {isLoading\n              ? \"Searching...\"\n              : query.trim()\n                ? \"No icons found. Try a different search.\"\n                : \"Type to search icons from Iconify\"}\n          </ComboboxEmpty>\n          <ComboboxList>\n            {(group: (typeof groups)[number]) => (\n              <ComboboxGroup\n                key={group.value}\n                items={group.items}\n                className=\"py-2\"\n              >\n                <ComboboxLabel>{group.label}</ComboboxLabel>\n                <div className=\"grid grid-cols-6 gap-1 px-2 sm:grid-cols-8\">\n                  <ComboboxCollection>\n                    {(iconId: string) => (\n                      <ComboboxItem\n                        value={iconId}\n                        className={cn(\n                          \"flex size-10 shrink-0 items-center justify-center p-0 [&>svg]:hidden\"\n                        )}\n                      >\n                        <img\n                          src={getIconUrl(iconId, 24)}\n                          alt={iconId.split(\":\")[1] ?? iconId}\n                          className=\"size-6\"\n                          width={24}\n                          height={24}\n                        />\n                      </ComboboxItem>\n                    )}\n                  </ComboboxCollection>\n                </div>\n              </ComboboxGroup>\n            )}\n          </ComboboxList>\n        </ComboboxContent>\n      </Combobox>\n    </div>\n  )\n}\n",
+      "type": "registry:component"
+    },
+    {
+      "path": "lib/iconify.ts",
+      "content": "import type { IconifyInfo } from \"@iconify/types\"\n\nconst ICONIFY_API = \"https://api.iconify.design\"\n\n/** Search API response - pass through directly from https://api.iconify.design/search */\nexport interface IconifySearchResponse {\n  icons: string[]\n  total: number\n  limit: number\n  start: number\n  collections: Record<string, IconifyInfo>\n  request: Record<string, string>\n}\n\nexport async function searchIcons(\n  query: string,\n  options?: { limit?: number; start?: number }\n): Promise<IconifySearchResponse> {\n  const params = new URLSearchParams({\n    query: query.trim() || \" \",\n    limit: String(options?.limit ?? 64),\n    ...(options?.start != null && { start: String(options.start) }),\n  })\n\n  const response = await fetch(`${ICONIFY_API}/search?${params}`)\n\n  if (!response.ok) {\n    throw new Error(`Iconify API error: ${response.status}`)\n  }\n\n  return response.json()\n}\n\nexport function getIconUrl(iconId: string, size = 24): string {\n  const [prefix, name] = iconId.split(\":\")\n  if (!prefix || !name) return \"\"\n  return `https://api.iconify.design/${prefix}/${name}.svg?height=${size}`\n}\n",
+      "type": "registry:lib"
+    },
+    {
+      "path": "hooks/use-iconify-search.ts",
+      "content": "\"use client\"\n\nimport { useQuery } from \"@tanstack/react-query\"\nimport { searchIcons, type IconifySearchResponse } from \"@/lib/iconify\"\n\nexport function useIconifySearch(query: string) {\n  return useQuery<IconifySearchResponse>({\n    queryKey: [\"iconify-search\", query],\n    queryFn: () => searchIcons(query),\n    enabled: query.trim().length > 0,\n    staleTime: 1000 * 60 * 5,\n  })\n}\n",
+      "type": "registry:hook"
+    }
+  ],
+  "type": "registry:component"
+}

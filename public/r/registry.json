@@ -1,0 +1,29 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry.json",
+  "name": "iconify-search",
+  "homepage": "https://acme.com",
+  "items": [
+    {
+      "name": "iconify-search",
+      "type": "registry:component",
+      "title": "Iconify Search",
+      "description": "Search and browse icons from the Iconify API.",
+      "registryDependencies": ["combobox"],
+      "dependencies": ["@tanstack/react-query"],
+      "files": [
+        {
+          "path": "registry/new-york/blocks/iconify-search/iconify-search.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "lib/iconify.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "hooks/use-iconify-search.ts",
+          "type": "registry:hook"
+        }
+      ]
+    }
+  ]
+}
