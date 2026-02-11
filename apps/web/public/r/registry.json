@@ -8,11 +8,7 @@
       "type": "registry:component",
       "title": "Iconify Search",
       "description": "Button that opens a dialog to search and browse icons grouped by collection.",
-      "registryDependencies": [
-        "dialog",
-        "button",
-        "input"
-      ],
+      "registryDependencies": ["dialog", "button", "input"],
       "dependencies": [
         "@gijsroge/iconify-search",
         "@tanstack/react-query",
