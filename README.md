@@ -1,23 +1,83 @@
-# registry-template
+# Iconify Search
 
-You can use the `shadcn` CLI to run your own component registry. Running your own
-component registry allows you to distribute your custom components, hooks, pages, and
-other files to any React project.
+![Demo](docs/demo.gif)
 
-> [!IMPORTANT]  
-> This template uses Tailwind v4. For Tailwind v3, see [registry-template-v3](https://github.com/shadcn-ui/registry-template-v3).
+Search and pick icons from [Iconify](https://iconify.design) in your React app. Use the ready-to-use component via shadcn, or the renderless primitive to build your own UI.
 
-## Getting Started
+> This project uses the [Iconify API](https://iconify.design) to search icons. If you find it useful, please consider [supporting Iconify](https://iconify.design/sponsors/).
 
-This is a template for creating a custom registry using Next.js.
+## Installation
 
-- The template uses a `registry.json` file to define components and their files.
-- The `shadcn build` command is used to build the registry.
-- The registry items are served as static files under `public/r/[name].json`.
-- The template also includes a route handler for serving registry items.
-- Every registry item are compatible with the `shadcn` CLI.
-- We have also added v0 integration using the `Open in v0` api.
+### Option 1: shadcn registry
 
-## Documentation
+Add the ready-to-use component to your shadcn/ui project:
 
-Visit the [shadcn documentation](https://ui.shadcn.com/docs/registry) to view the full documentation.
+```bash
+npx shadcn@latest add "https://your-registry-domain.com/r/iconify-search.json"
+```
+
+### Option 2: Package manager
+
+Installs only the renderless component — no pre-built UI. You get `IconifySearchPrimitive` and build whatever you want.
+
+```bash
+bun add @gijsroge/iconify-search
+npm install @gijsroge/iconify-search
+pnpm add @gijsroge/iconify-search
+yarn add @gijsroge/iconify-search
+```
+
+Requires `@tanstack/react-query` and `@tanstack/react-pacer` as peer dependencies. Add them if not already installed:
+
+```bash
+bun add @tanstack/react-query @tanstack/react-pacer
+```
+
+## Examples
+
+### Ready-to-use component (shadcn)
+
+`IconifySearch` — a button that opens a search interface to browse icons.
+
+```tsx
+import { IconifySearch } from "@/components/iconify-search";
+
+// Single icon selection
+<IconifySearch />
+
+// Multiple icon selection
+<IconifySearch multiple />
+```
+
+### Renderless component
+
+`IconifySearchPrimitive` exposes search state and actions via render props. Build any UI you want.
+
+```tsx
+import { IconifySearchPrimitive } from "@gijsroge/iconify-search";
+
+<IconifySearchPrimitive multiple debounceMs={300}>
+  {(state) => (
+    <div>
+      <input
+        value={state.query}
+        onChange={(e) => state.setQuery(e.target.value)}
+        placeholder="Search icons..."
+      />
+      {state.isPending && <span>Loading...</span>}
+      <div>
+        {state.groups.map(({ prefix, icons }) => (
+          <div key={prefix}>
+            {icons.map((iconId) => (
+              <button key={iconId} onClick={() => state.selectIcon(iconId)}>
+                <img src={state.getIconUrl(iconId, 24)} alt={iconId} />
+              </button>
+            ))}
+          </div>
+        ))}
+      </div>
+      <p>Selected: {state.selectedIcons.join(", ")}</p>
+    </div>
+  )}
+</IconifySearchPrimitive>;
+```

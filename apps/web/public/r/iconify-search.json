@@ -1,0 +1,61 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "iconify-search",
+  "title": "Iconify Search",
+  "description": "Button that opens a dialog to search and browse icons grouped by collection.",
+  "dependencies": [
+    "@gijsroge/iconify-search",
+    "@tanstack/react-query",
+    "@tanstack/react-pacer"
+  ],
+  "registryDependencies": [
+    "dialog",
+    "button",
+    "input"
+  ],
+  "files": [
+    {
+      "path": "registry/new-york/blocks/iconify-search/iconify-search.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\nimport { LoaderIcon, SearchIcon } from \"lucide-react\";\nimport {\n  Dialog,\n  DialogContent,\n  DialogHeader,\n  DialogTitle,\n  DialogTrigger,\n} from \"@/components/ui/dialog\";\nimport { Button } from \"@/components/ui/button\";\nimport { Input } from \"@/components/ui/input\";\nimport { IconifySearchPrimitive } from \"@gijsroge/iconify-search\";\nimport { cn } from \"@/lib/utils\";\n\nexport interface IconifySearchProps {\n  /** Allow selecting multiple icons */\n  multiple?: boolean;\n}\n\nexport function IconifySearch({\n  multiple = false,\n}: IconifySearchProps): React.ReactElement | null {\n  const [open, setOpen] = React.useState(false);\n\n  return (\n    <IconifySearchPrimitive debounceMs={300} multiple={multiple}>\n      {(state) => (\n        <Dialog open={open} onOpenChange={setOpen}>\n          <DialogTrigger asChild>\n            <Button variant=\"outline\" size=\"sm\">\n              {state.selectedIcons.length > 0 ? (\n                <span className=\"flex items-center gap-2\">\n                  {state.selectedIcons.slice(0, 3).map((iconId) => (\n                    <img\n                      key={iconId}\n                      src={state.getIconUrl(iconId, 18)}\n                      alt=\"\"\n                      className=\"size-4\"\n                      width={18}\n                      height={18}\n                    />\n                  ))}\n                  {state.selectedIcons.length > 3 && (\n                    <span className=\"text-muted-foreground text-xs\">\n                      +{state.selectedIcons.length - 3}\n                    </span>\n                  )}\n                  {!state.multiple && state.selectedIcons[0] && (\n                    <span>\n                      {state.selectedIcons[0].split(\":\")[1] ??\n                        state.selectedIcons[0]}\n                    </span>\n                  )}\n                </span>\n              ) : (\n                <span className=\"flex items-center gap-2\">\n                  <SearchIcon className=\"size-4\" />\n                  {state.multiple ? \"Pick icons\" : \"Pick icon\"}\n                </span>\n              )}\n            </Button>\n          </DialogTrigger>\n          <DialogContent className=\"flex h-[520px] flex-col gap-4 sm:max-w-xl\">\n            <DialogHeader>\n              <DialogTitle>Search icons</DialogTitle>\n            </DialogHeader>\n            <div className=\"flex min-h-0 flex-1 flex-col gap-4\">\n              <div className=\"relative shrink-0\">\n                <Input\n                  placeholder=\"Search icons...\"\n                  value={state.query}\n                  onChange={(e) => state.setQuery(e.target.value)}\n                  className=\"pr-9\"\n                />\n                {state.isPending && (\n                  <LoaderIcon\n                    className=\"text-muted-foreground absolute right-3 top-1/2 size-4 -translate-y-1/2 animate-spin\"\n                    aria-hidden\n                  />\n                )}\n              </div>\n              <div className=\"scroll-fade-y min-h-0 flex-1\">\n                {!state.debouncedQuery.trim() ? (\n                  <p className=\"text-muted-foreground py-8 text-center text-sm\">\n                    Type to search icons from Iconify\n                  </p>\n                ) : state.isPending && !state.data ? (\n                  <p className=\"text-muted-foreground py-8 text-center text-sm\">\n                    Searching...\n                  </p>\n                ) : state.groups.length === 0 ? (\n                  <p className=\"text-muted-foreground py-8 text-center text-sm\">\n                    No icons found. Try a different search.\n                  </p>\n                ) : (\n                  <div className=\"flex flex-col gap-6 pb-4\">\n                    {state.groups.map(({ prefix, name, icons }) => (\n                      <div key={prefix} className=\"flex flex-col gap-2\">\n                        <h3 className=\"text-muted-foreground sticky top-0 bg-background/95 px-2 py-1 text-xs font-medium backdrop-blur sm:px-0\">\n                          {name}\n                        </h3>\n                        <div className=\"grid grid-cols-6 gap-1 sm:grid-cols-8\">\n                          {icons.map((iconId) => {\n                            const isSelected =\n                              state.selectedIcons.includes(iconId);\n                            return (\n                              <button\n                                key={iconId}\n                                type=\"button\"\n                                onClick={() => {\n                                  state.selectIcon(iconId);\n                                  if (!state.multiple) setOpen(false);\n                                }}\n                                className={cn(\n                                  \"flex size-10 shrink-0 items-center justify-center rounded-md transition-colors hover:bg-accent\",\n                                  isSelected && \"bg-accent\"\n                                )}\n                              >\n                                <img\n                                  src={state.getIconUrl(iconId, 24)}\n                                  alt={iconId.split(\":\")[1] ?? iconId}\n                                  className=\"size-6\"\n                                  width={24}\n                                  height={24}\n                                />\n                              </button>\n                            );\n                          })}\n                        </div>\n                      </div>\n                    ))}\n                  </div>\n                )}\n              </div>\n            </div>\n            {state.multiple && state.selectedIcons.length > 0 && (\n              <div className=\"flex items-center justify-between gap-4 pt-2 border-t -mx-6 px-6\">\n                <div className=\"relative min-w-0 flex-1 overflow-hidden\">\n                  <div\n                    className=\"flex gap-1 overflow-x-auto pb-1 scrollbar-width:none [&::-webkit-scrollbar]:hidden\"\n                    style={{\n                      maskImage:\n                        \"linear-gradient(to right, black 70%, transparent 100%)\",\n                      WebkitMaskImage:\n                        \"linear-gradient(to right, black 70%, transparent 100%)\",\n                    }}\n                  >\n                    {state.selectedIcons.map((iconId) => (\n                      <img\n                        key={iconId}\n                        src={state.getIconUrl(iconId, 24)}\n                        alt={iconId.split(\":\")[1] ?? iconId}\n                        className=\"size-6 shrink-0 rounded\"\n                        width={16}\n                        height={16}\n                      />\n                    ))}\n                  </div>\n                </div>\n                <Button\n                  variant=\"ghost\"\n                  size=\"sm\"\n                  className=\"shrink-0 text-muted-foreground hover:text-foreground\"\n                  onClick={() => state.setSelectedIcons([])}\n                >\n                  Clear all\n                </Button>\n              </div>\n            )}\n          </DialogContent>\n        </Dialog>\n      )}\n    </IconifySearchPrimitive>\n  );\n}\n",
+      "type": "registry:component"
+    }
+  ],
+  "css": {
+    "@property --top-fade": {
+      "syntax": "<length>",
+      "inherits": "false",
+      "initial-value": "0"
+    },
+    "@property --bottom-fade": {
+      "syntax": "<length>",
+      "inherits": "false",
+      "initial-value": "0"
+    },
+    "@keyframes scrollfade-y": {
+      "0%": {
+        "--top-fade": "0",
+        "--bottom-fade": "3rem"
+      },
+      "10%": {
+        "--top-fade": "3rem"
+      },
+      "90%": {
+        "--bottom-fade": "3rem"
+      },
+      "100%": {
+        "--top-fade": "3rem",
+        "--bottom-fade": "0"
+      }
+    },
+    ".scroll-fade-y": {
+      "overflow-y": "auto",
+      "scroll-timeline": "--scrollfade block",
+      "animation": "scrollfade-y linear",
+      "animation-timeline": "--scrollfade",
+      "animation-fill-mode": "both",
+      "mask": "linear-gradient(to bottom, transparent 0, black var(--top-fade), black calc(100% - var(--bottom-fade)), transparent 100%)",
+      "-webkit-mask": "linear-gradient(to bottom, transparent 0, black var(--top-fade), black calc(100% - var(--bottom-fade)), transparent 100%)"
+    }
+  },
+  "type": "registry:component"
+}
