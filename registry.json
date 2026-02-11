@@ -8,25 +8,19 @@
       "type": "registry:component",
       "title": "Iconify Search",
       "description": "Search and browse icons from the Iconify API.",
-      "registryDependencies": [
-        "combobox"
-      ],
-      "dependencies": [
-        "@tanstack/react-query"
-      ],
+      "registryDependencies": ["combobox"],
+      "dependencies": ["@tanstack/react-query", "@tanstack/react-pacer"],
       "files": [
         {
           "path": "registry/new-york/blocks/iconify-search/iconify-search.tsx",
           "type": "registry:component"
         },
         {
-          "path": "lib/iconify.ts",
-          "type": "registry:lib"
+          "path": "components/iconify-search-primitive.tsx",
+          "type": "registry:component"
         },
-        {
-          "path": "hooks/use-iconify-search.ts",
-          "type": "registry:hook"
-        }
+        { "path": "lib/iconify.ts", "type": "registry:lib" },
+        { "path": "hooks/use-iconify-search.ts", "type": "registry:hook" }
       ]
     },
     {
@@ -34,28 +28,34 @@
       "type": "registry:component",
       "title": "Iconify Search Dialog",
       "description": "Button that opens a dialog to search and browse icons grouped by collection.",
-      "registryDependencies": [
-        "dialog",
-        "button",
-        "input"
-      ],
-      "dependencies": [
-        "@tanstack/react-query",
-        "@tanstack/react-pacer"
-      ],
+      "registryDependencies": ["dialog", "button", "input"],
+      "dependencies": ["@tanstack/react-query", "@tanstack/react-pacer"],
       "files": [
         {
           "path": "registry/new-york/blocks/iconify-search-dialog/iconify-search-dialog.tsx",
           "type": "registry:component"
         },
         {
-          "path": "lib/iconify.ts",
-          "type": "registry:lib"
+          "path": "components/iconify-search-primitive.tsx",
+          "type": "registry:component"
         },
+        { "path": "lib/iconify.ts", "type": "registry:lib" },
+        { "path": "hooks/use-iconify-search.ts", "type": "registry:hook" }
+      ]
+    },
+    {
+      "name": "iconify-search-primitive",
+      "type": "registry:component",
+      "title": "Iconify Search Primitive",
+      "description": "Renderless component for Iconify icon search. Build custom UIs with search state, grouping, and selection via render props.",
+      "dependencies": ["@tanstack/react-query", "@tanstack/react-pacer"],
+      "files": [
         {
-          "path": "hooks/use-iconify-search.ts",
-          "type": "registry:hook"
-        }
+          "path": "components/iconify-search-primitive.tsx",
+          "type": "registry:component"
+        },
+        { "path": "lib/iconify.ts", "type": "registry:lib" },
+        { "path": "hooks/use-iconify-search.ts", "type": "registry:hook" }
       ]
     }
   ]
