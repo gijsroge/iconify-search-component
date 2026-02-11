@@ -1,6 +1,5 @@
 import * as React from "react"
 import { OpenInV0Button } from "@/components/open-in-v0-button"
-import { IconifySearch } from "@/registry/new-york/blocks/iconify-search/iconify-search"
 import { IconifySearchDialog } from "@/registry/new-york/blocks/iconify-search-dialog/iconify-search-dialog"
 
 export default function Home() {
@@ -13,26 +12,26 @@ export default function Home() {
         </p>
       </header>
       <main className="flex flex-col flex-1 gap-8">
-        <div className="flex flex-col gap-4 border rounded-lg p-4 min-h-[450px] relative">
-          <div className="flex items-center justify-between">
-            <h2 className="text-sm text-muted-foreground sm:pl-3">
-              Iconify Search
-            </h2>
-            <OpenInV0Button name="iconify-search" className="w-fit" />
-          </div>
-          <div className="flex items-center justify-center min-h-[400px] relative">
-            <IconifySearch />
-          </div>
-        </div>
         <div className="flex flex-col gap-4 border rounded-lg p-4 min-h-[200px] relative">
           <div className="flex items-center justify-between">
             <h2 className="text-sm text-muted-foreground sm:pl-3">
-              Iconify Search Dialog
+              Iconify Search Dialog (single)
             </h2>
             <OpenInV0Button name="iconify-search-dialog" className="w-fit" />
           </div>
           <div className="flex items-center justify-center min-h-[150px]">
             <IconifySearchDialog />
+          </div>
+        </div>
+        <div className="flex flex-col gap-4 border rounded-lg p-4 min-h-[200px] relative">
+          <div className="flex items-center justify-between">
+            <h2 className="text-sm text-muted-foreground sm:pl-3">
+              Iconify Search Dialog (multiple)
+            </h2>
+            <OpenInV0Button name="iconify-search-dialog" className="w-fit" />
+          </div>
+          <div className="flex items-center justify-center min-h-[150px]">
+            <IconifySearchDialog multiple />
           </div>
         </div>
       </main>
