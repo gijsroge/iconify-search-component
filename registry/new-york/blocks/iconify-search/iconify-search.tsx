@@ -300,7 +300,7 @@ function IconifySearchUI({
           {!state.debouncedQuery.trim() ? (
             <div className="scroll-fade-y min-h-0 flex-1">
               <p className="text-muted-foreground py-8 text-center text-sm">
-                Type to search icons from Iconify
+                Type to search icons
               </p>
             </div>
           ) : state.isPending && !state.data ? (
