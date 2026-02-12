@@ -13,7 +13,7 @@ import { cn } from "@/lib/utils";
 import type { IconifySearchState } from "@gijsroge/iconify-search";
 import { IconifySearchPrimitive } from "@gijsroge/iconify-search";
 import { useVirtualizer } from "@tanstack/react-virtual";
-import { LoaderIcon, SearchIcon } from "lucide-react";
+import { LoaderIcon, SearchIcon, X } from "lucide-react";
 import * as React from "react";
 
 const ICONS_PER_ROW = 8;
@@ -200,40 +200,58 @@ export function IconifySearch({
     >
       {(state) => (
         <Dialog open={open} onOpenChange={setOpen}>
-          <DialogTrigger asChild>
-            <Button variant="outline" size="sm">
-              {state.selectedIcons.length > 0 ? (
-                <span className="flex items-center gap-2">
-                  {state.selectedIcons.slice(0, 3).map((iconId) => (
-                    <img
-                      key={iconId}
-                      src={state.getIconUrl(iconId, 18)}
-                      alt=""
-                      className="size-4"
-                      width={18}
-                      height={18}
-                    />
-                  ))}
-                  {state.selectedIcons.length > 3 && (
-                    <span className="text-muted-foreground text-xs">
-                      +{state.selectedIcons.length - 3}
-                    </span>
-                  )}
-                  {!state.multiple && state.selectedIcons[0] && (
-                    <span>
-                      {state.selectedIcons[0].split(":")[1] ??
-                        state.selectedIcons[0]}
-                    </span>
-                  )}
-                </span>
-              ) : (
-                <span className="flex items-center gap-2">
-                  <SearchIcon className="size-4" />
-                  {state.multiple ? "Pick icons" : "Pick icon"}
-                </span>
-              )}
-            </Button>
-          </DialogTrigger>
+          <div className="relative">
+            <DialogTrigger asChild>
+              <Button
+                variant="outline"
+                size="sm"
+                className={cn(state.selectedIcons.length > 0 && "pr-8")}
+              >
+                {state.selectedIcons.length > 0 ? (
+                  <span className="flex items-center gap-2">
+                    {state.selectedIcons.slice(0, 3).map((iconId) => (
+                      <img
+                        key={iconId}
+                        src={state.getIconUrl(iconId, 18)}
+                        alt=""
+                        className="size-4"
+                        width={18}
+                        height={18}
+                      />
+                    ))}
+                    {state.selectedIcons.length > 3 && (
+                      <span className="text-muted-foreground text-xs">
+                        +{state.selectedIcons.length - 3}
+                      </span>
+                    )}
+                    {!state.multiple && state.selectedIcons[0] && (
+                      <span>
+                        {state.selectedIcons[0].split(":")[1] ??
+                          state.selectedIcons[0]}
+                      </span>
+                    )}
+                  </span>
+                ) : (
+                  <span className="flex items-center gap-2">
+                    <SearchIcon className="size-4" />
+                    {state.multiple ? "Pick icons" : "Pick icon"}
+                  </span>
+                )}
+              </Button>
+            </DialogTrigger>
+            {state.selectedIcons.length > 0 && (
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                className="group text-foreground/50 hover:text-foreground bg-transparent! absolute right-px top-px size-8 max-h-[calc(100%-2px)] shrink-0"
+                onClick={() => state.setSelectedIcons([])}
+                aria-label="Clear selection"
+              >
+                <X className="size-4 scale-80 group-hover:scale-90 transition-all" />
+              </Button>
+            )}
+          </div>
           <DialogContent className="flex h-[520px] flex-col gap-4 sm:max-w-xl">
             <DialogHeader>
               <DialogTitle>Search icons</DialogTitle>
