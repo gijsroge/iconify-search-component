@@ -32,6 +32,23 @@ export async function searchIcons(
 
 export function getIconUrl(iconId: string, size = 24): string {
   const [prefix, name] = iconId.split(":");
-  if (!prefix || !name) return "";
+  if (!prefix || !name) {
+    throw new Error(
+      `Invalid icon ID: "${iconId}". Expected format "prefix:name".`
+    );
+  }
   return `https://api.iconify.design/${prefix}/${name}.svg?height=${size}`;
+}
+
+/**
+ * Fetches the SVG markup for an icon by its ID (e.g. "mdi:home").
+ * Returns the raw SVG string, or throws on invalid ID or network error.
+ */
+export async function getIconSvg(iconId: string, size = 24): Promise<string> {
+  const url = getIconUrl(iconId, size);
+  const response = await fetch(url);
+  if (!response.ok) {
+    throw new Error(`Failed to fetch icon "${iconId}": ${response.status}`);
+  }
+  return response.text();
 }

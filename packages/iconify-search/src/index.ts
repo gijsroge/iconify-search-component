@@ -9,5 +9,6 @@ export {
 export {
   searchIcons,
   getIconUrl,
+  getIconSvg,
   type IconifySearchResponse,
 } from "./iconify.js";

@@ -10,6 +10,7 @@
     "registry:build": "shadcn build",
     "package:build": "cd packages/iconify-search && bun run build",
     "typecheck": "tsc --noEmit",
+    "test": "cd packages/iconify-search && bun run test",
     "publish:package": "cd packages/iconify-search && bun run build && bun publish"
   },
   "dependencies": {
