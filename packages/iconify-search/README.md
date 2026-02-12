@@ -62,11 +62,17 @@ function MyIconPicker() {
 
 ### `IconifySearchPrimitive`
 
-| Prop         | Type                   | Default | Description                                                |
-| ------------ | ---------------------- | ------- | ---------------------------------------------------------- |
-| `multiple`   | `boolean`              | `false` | Allow selecting multiple icons. When `false`, max one.     |
-| `debounceMs` | `number`               | `300`   | Debounce delay (ms) before calling the Iconify search API. |
-| `children`   | `(state) => ReactNode` | —       | Render prop receiving the search state.                    |
+| Prop                 | Type                     | Default | Description                                                                 |
+| -------------------- | ------------------------ | ------- | --------------------------------------------------------------------------- |
+| `multiple`           | `boolean`                | `false` | Allow selecting multiple icons. When `false`, max one.                      |
+| `debounceMs`         | `number`                 | `300`   | Debounce delay (ms) before calling the Iconify search API.                  |
+| `value`              | `string[]`               | —       | Controlled selected icon IDs (e.g. `["mdi:home"]`). Use with `onValueChange`. |
+| `defaultValue`       | `string[]`               | `[]`    | Initial selected icon IDs when uncontrolled.                                |
+| `onValueChange`      | `(value: string[]) => void` | —    | Called when the selection changes.                                          |
+| `searchValue`        | `string`                 | —       | Controlled search query. Use with `onSearchChange`.                         |
+| `defaultSearchValue` | `string`                 | `""`    | Initial search query when uncontrolled.                                     |
+| `onSearchChange`     | `(value: string) => void` | —     | Called when the search query changes.                                      |
+| `children`           | `(state) => ReactNode`   | —       | Render prop receiving the search state.                                     |
 
 ### State (`IconifySearchState`)
 

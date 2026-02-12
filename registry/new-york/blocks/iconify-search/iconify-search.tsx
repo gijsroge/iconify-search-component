@@ -360,13 +360,21 @@ function IconifySearchUI({
 }
 
 export interface IconifySearchProps {
+  /** When true, allows selecting multiple icons. When false, selecting an icon closes the dialog. Default: false */
   multiple?: boolean;
+  /** Disables the trigger button, clear button, search input, and icon selection. Default: false */
   disabled?: boolean;
+  /** Controlled selected icon IDs (e.g. ["mdi:home", "lucide:search"]). Use with onValueChange. */
   value?: string[];
+  /** Initial selected icon IDs when uncontrolled. Default: [] */
   defaultValue?: string[];
+  /** Called when the selection changes. Receives the new array of selected icon IDs. */
   onValueChange?: (value: string[]) => void;
+  /** Controlled search input value. Use with onSearchChange. */
   searchValue?: string;
+  /** Initial search input value when uncontrolled. Default: "" */
   defaultSearchValue?: string;
+  /** Called when the user types in the search field. Receives the new search string. */
   onSearchChange?: (value: string) => void;
 }
 

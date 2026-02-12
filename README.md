@@ -49,6 +49,21 @@ import { IconifySearch } from "@/components/iconify-search";
 <IconifySearch multiple />
 ```
 
+#### Props
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `multiple` | `boolean` | `false` | When `true`, allows selecting multiple icons. When `false`, selecting an icon closes the dialog and replaces the previous selection. |
+| `disabled` | `boolean` | `false` | Disables the trigger button, clear button, search input, and icon selection. |
+| `value` | `string[]` | — | Controlled selected icon IDs (e.g. `["mdi:home", "lucide:search"]`). Use with `onValueChange` for controlled mode. |
+| `defaultValue` | `string[]` | `[]` | Initial selected icon IDs when uncontrolled. |
+| `onValueChange` | `(value: string[]) => void` | — | Called when the selection changes. Receives the new array of selected icon IDs. |
+| `searchValue` | `string` | — | Controlled search input value. Use with `onSearchChange` for controlled mode. |
+| `defaultSearchValue` | `string` | `""` | Initial search input value when uncontrolled. |
+| `onSearchChange` | `(value: string) => void` | — | Called when the user types in the search field. Receives the new search string. |
+
+Icon IDs are in the form `prefix:name` (e.g. `mdi:home`, `lucide:search`).
+
 ### Renderless component
 
 `IconifySearchPrimitive` exposes search state and actions via render props. Build any UI you want.
