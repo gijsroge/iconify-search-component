@@ -77,9 +77,26 @@ export default function Home() {
   return (
     <div className="max-w-3xl mx-auto flex flex-col min-h-svh px-4 py-8 gap-8">
       <header className="flex flex-col gap-6">
-        <h1 className="text-3xl font-bold tracking-tight m-0">
-          Iconify Search
-        </h1>
+        <div className="flex items-center justify-between gap-y-6 gap-x-4 flex-wrap">
+          <h1 className="text-3xl font-bold tracking-tight m-0">
+            Iconify search
+          </h1>
+
+          <div className="flex items-center gap-2 m-0">
+            <a
+              href={GITHUB_URL}
+              target="_blank"
+              rel="noreferrer noopener"
+              className="inline-flex items-center gap-1.5 rounded-md border bg-background px-2.5 py-1.5 text-sm font-medium text-foreground shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground"
+              aria-label="View on GitHub"
+            >
+              <Github className="h-4 w-4" />
+              GitHub
+            </a>
+            <GitHubStarsButton />
+            <TweetButton />
+          </div>
+        </div>
 
         <p className="text-muted-foreground max-w-xl m-0">
           Search and pick icons from{" "}
@@ -97,21 +114,6 @@ export default function Home() {
           </code>{" "}
           package with a renderless primitive to build your own UI.
         </p>
-
-        <div className="flex items-center gap-2 m-0">
-          <a
-            href={GITHUB_URL}
-            target="_blank"
-            rel="noreferrer noopener"
-            className="inline-flex items-center gap-1.5 rounded-md border bg-background px-2.5 py-1.5 text-sm font-medium text-foreground shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground"
-            aria-label="View on GitHub"
-          >
-            <Github className="h-4 w-4" />
-            GitHub
-          </a>
-          <GitHubStarsButton />
-          <TweetButton />
-        </div>
       </header>
       <main className="flex flex-col flex-1 gap-8">
         <div className="flex flex-col gap-4 border rounded-lg p-4 min-h-[200px] relative">

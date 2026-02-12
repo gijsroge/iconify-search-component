@@ -34,6 +34,8 @@ jobs:
       - name: Build static site
         env:
           GITHUB_PAGES_BASE_PATH: /iconify-search
+          # Base URL for OG image, Open in v0, etc. Must match where this artifact is deployed.
+          NEXT_PUBLIC_BASE_URL: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/
         run: bun run build
 
       - name: Upload artifact
