@@ -269,7 +269,7 @@ function IconifySearchUI({
             variant="ghost"
             size="icon"
             disabled={disabled}
-            className="group text-foreground/50 hover:text-foreground bg-transparent! absolute right-px top-px size-8 max-h-[calc(100%-2px)] shrink-0"
+            className="group text-foreground/50 hover:text-foreground bg-transparent! absolute right-px top-1/2 -translate-y-1/2 size-8 max-h-[calc(100%-2px)] shrink-0"
             onClick={() => state.setSelectedIcons([])}
             aria-label="Clear selection"
           >
