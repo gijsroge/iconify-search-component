@@ -20,6 +20,18 @@ const ICONS_PER_ROW = 8;
 const ROW_HEIGHT = 40;
 const HEADER_ROW_HEIGHT = 28;
 
+type IconifySearchContextValue = {
+  disabled: boolean;
+};
+
+const IconifySearchContext = React.createContext<IconifySearchContextValue | null>(null);
+
+function useIconifySearchContext(): IconifySearchContextValue {
+  const ctx = React.useContext(IconifySearchContext);
+  if (!ctx) throw new Error("useIconifySearchContext must be used within IconifySearch");
+  return ctx;
+}
+
 type VirtualRow =
   | { type: "header"; name: string; key: string }
   | { type: "icons"; iconIds: string[]; key: string };
@@ -56,14 +68,17 @@ const IconCell = React.memo(function IconCell({
   multiple: boolean;
   getIconUrl: (iconId: string, size?: number) => string;
 }) {
+  const { disabled } = useIconifySearchContext();
   const onSelect = React.useCallback(() => {
+    if (disabled) return;
     selectIcon(iconId);
     if (!multiple) onClose();
-  }, [selectIcon, iconId, multiple, onClose]);
+  }, [selectIcon, iconId, multiple, onClose, disabled]);
 
   return (
     <button
       type="button"
+      disabled={disabled}
       onClick={onSelect}
       className={cn(
         "flex size-10 shrink-0 items-center justify-center rounded-md transition-colors hover:bg-accent",
@@ -165,9 +180,160 @@ function VirtualizedIconList({
   );
 }
 
+function IconifySearchUI({
+  state,
+  open,
+  setOpen,
+}: {
+  state: IconifySearchState;
+  open: boolean;
+  setOpen: (open: boolean) => void;
+}) {
+  const { disabled } = useIconifySearchContext();
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <div className="relative">
+        <DialogTrigger asChild>
+          <Button
+            variant="outline"
+            size="sm"
+            disabled={disabled}
+            className={cn(state.selectedIcons.length > 0 && "pr-8")}
+          >
+            {state.selectedIcons.length > 0 ? (
+              <span className="flex items-center gap-2">
+                {state.selectedIcons.slice(0, 3).map((iconId) => (
+                  <img
+                    key={iconId}
+                    src={state.getIconUrl(iconId, 18)}
+                    alt=""
+                    className="size-4"
+                    width={18}
+                    height={18}
+                  />
+                ))}
+                {state.selectedIcons.length > 3 && (
+                  <span className="text-muted-foreground text-xs">
+                    +{state.selectedIcons.length - 3}
+                  </span>
+                )}
+                {!state.multiple && state.selectedIcons[0] && (
+                  <span>
+                    {state.selectedIcons[0].split(":")[1] ??
+                      state.selectedIcons[0]}
+                  </span>
+                )}
+              </span>
+            ) : (
+              <span className="flex items-center gap-2">
+                <SearchIcon className="size-4" />
+                {state.multiple ? "Pick icons" : "Pick icon"}
+              </span>
+            )}
+          </Button>
+        </DialogTrigger>
+        {state.selectedIcons.length > 0 && (
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            disabled={disabled}
+            className="group text-foreground/50 hover:text-foreground bg-transparent! absolute right-px top-px size-8 max-h-[calc(100%-2px)] shrink-0"
+            onClick={() => state.setSelectedIcons([])}
+            aria-label="Clear selection"
+          >
+            <X className="size-4 scale-80 group-hover:scale-90 transition-all" />
+          </Button>
+        )}
+      </div>
+      <DialogContent className="flex h-[520px] flex-col gap-4 sm:max-w-xl">
+        <DialogHeader>
+          <DialogTitle>Search icons</DialogTitle>
+        </DialogHeader>
+        <div className="flex min-h-0 flex-1 flex-col gap-4">
+          <div className="relative shrink-0">
+            <Input
+              placeholder="Search icons..."
+              value={state.query}
+              onChange={(e) => state.setQuery(e.target.value)}
+              disabled={disabled}
+              className="pr-9"
+            />
+            {state.isPending && (
+              <LoaderIcon
+                className="text-muted-foreground absolute right-3 top-1/2 size-4 -translate-y-1/2 animate-spin"
+                aria-hidden
+              />
+            )}
+          </div>
+          {!state.debouncedQuery.trim() ? (
+            <div className="scroll-fade-y min-h-0 flex-1">
+              <p className="text-muted-foreground py-8 text-center text-sm">
+                Type to search icons from Iconify
+              </p>
+            </div>
+          ) : state.isPending && !state.data ? (
+            <div className="scroll-fade-y min-h-0 flex-1">
+              <p className="text-muted-foreground py-8 text-center text-sm">
+                Searching...
+              </p>
+            </div>
+          ) : state.groups.length === 0 ? (
+            <div className="scroll-fade-y min-h-0 flex-1">
+              <p className="text-muted-foreground py-8 text-center text-sm">
+                No icons found. Try a different search.
+              </p>
+            </div>
+          ) : (
+            <VirtualizedIconList state={state} setOpen={setOpen} />
+          )}
+        </div>
+        {state.multiple && state.selectedIcons.length > 0 && (
+          <div className="flex items-center justify-between gap-4 pt-2 border-t -mx-6 px-6">
+            <div className="relative min-w-0 flex-1 overflow-hidden">
+              <div
+                className="flex gap-1 overflow-x-auto pb-1 scrollbar-width:none [&::-webkit-scrollbar]:hidden"
+                style={{
+                  maskImage:
+                    "linear-gradient(to right, black 70%, transparent 100%)",
+                  WebkitMaskImage:
+                    "linear-gradient(to right, black 70%, transparent 100%)",
+                }}
+              >
+                {state.selectedIcons.map((iconId) => (
+                  <img
+                    key={iconId}
+                    src={state.getIconUrl(iconId, 24)}
+                    alt={iconId.split(":")[1] ?? iconId}
+                    className="size-6 shrink-0 rounded"
+                    width={16}
+                    height={16}
+                  />
+                ))}
+              </div>
+            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              disabled={disabled}
+              className="shrink-0 text-muted-foreground hover:text-foreground"
+              onClick={() => state.setSelectedIcons([])}
+            >
+              Clear all
+            </Button>
+          </div>
+        )}
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 export interface IconifySearchProps {
   /** Allow selecting multiple icons */
   multiple?: boolean;
+  /** Disable the trigger, clear button, search input, and actions */
+  disabled?: boolean;
   value?: string[];
   defaultValue?: string[];
   onValueChange?: (value: string[]) => void;
@@ -177,7 +343,8 @@ export interface IconifySearchProps {
 }
 
 export function IconifySearch({
-  multiple = false,
+  multiple,
+  disabled,
   value,
   defaultValue,
   onValueChange,
@@ -199,136 +366,11 @@ export function IconifySearch({
       onSearchChange={onSearchChange}
     >
       {(state) => (
-        <Dialog open={open} onOpenChange={setOpen}>
-          <div className="relative">
-            <DialogTrigger asChild>
-              <Button
-                variant="outline"
-                size="sm"
-                className={cn(state.selectedIcons.length > 0 && "pr-8")}
-              >
-                {state.selectedIcons.length > 0 ? (
-                  <span className="flex items-center gap-2">
-                    {state.selectedIcons.slice(0, 3).map((iconId) => (
-                      <img
-                        key={iconId}
-                        src={state.getIconUrl(iconId, 18)}
-                        alt=""
-                        className="size-4"
-                        width={18}
-                        height={18}
-                      />
-                    ))}
-                    {state.selectedIcons.length > 3 && (
-                      <span className="text-muted-foreground text-xs">
-                        +{state.selectedIcons.length - 3}
-                      </span>
-                    )}
-                    {!state.multiple && state.selectedIcons[0] && (
-                      <span>
-                        {state.selectedIcons[0].split(":")[1] ??
-                          state.selectedIcons[0]}
-                      </span>
-                    )}
-                  </span>
-                ) : (
-                  <span className="flex items-center gap-2">
-                    <SearchIcon className="size-4" />
-                    {state.multiple ? "Pick icons" : "Pick icon"}
-                  </span>
-                )}
-              </Button>
-            </DialogTrigger>
-            {state.selectedIcons.length > 0 && (
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                className="group text-foreground/50 hover:text-foreground bg-transparent! absolute right-px top-px size-8 max-h-[calc(100%-2px)] shrink-0"
-                onClick={() => state.setSelectedIcons([])}
-                aria-label="Clear selection"
-              >
-                <X className="size-4 scale-80 group-hover:scale-90 transition-all" />
-              </Button>
-            )}
-          </div>
-          <DialogContent className="flex h-[520px] flex-col gap-4 sm:max-w-xl">
-            <DialogHeader>
-              <DialogTitle>Search icons</DialogTitle>
-            </DialogHeader>
-            <div className="flex min-h-0 flex-1 flex-col gap-4">
-              <div className="relative shrink-0">
-                <Input
-                  placeholder="Search icons..."
-                  value={state.query}
-                  onChange={(e) => state.setQuery(e.target.value)}
-                  className="pr-9"
-                />
-                {state.isPending && (
-                  <LoaderIcon
-                    className="text-muted-foreground absolute right-3 top-1/2 size-4 -translate-y-1/2 animate-spin"
-                    aria-hidden
-                  />
-                )}
-              </div>
-              {!state.debouncedQuery.trim() ? (
-                <div className="scroll-fade-y min-h-0 flex-1">
-                  <p className="text-muted-foreground py-8 text-center text-sm">
-                    Type to search icons from Iconify
-                  </p>
-                </div>
-              ) : state.isPending && !state.data ? (
-                <div className="scroll-fade-y min-h-0 flex-1">
-                  <p className="text-muted-foreground py-8 text-center text-sm">
-                    Searching...
-                  </p>
-                </div>
-              ) : state.groups.length === 0 ? (
-                <div className="scroll-fade-y min-h-0 flex-1">
-                  <p className="text-muted-foreground py-8 text-center text-sm">
-                    No icons found. Try a different search.
-                  </p>
-                </div>
-              ) : (
-                <VirtualizedIconList state={state} setOpen={setOpen} />
-              )}
-            </div>
-            {state.multiple && state.selectedIcons.length > 0 && (
-              <div className="flex items-center justify-between gap-4 pt-2 border-t -mx-6 px-6">
-                <div className="relative min-w-0 flex-1 overflow-hidden">
-                  <div
-                    className="flex gap-1 overflow-x-auto pb-1 scrollbar-width:none [&::-webkit-scrollbar]:hidden"
-                    style={{
-                      maskImage:
-                        "linear-gradient(to right, black 70%, transparent 100%)",
-                      WebkitMaskImage:
-                        "linear-gradient(to right, black 70%, transparent 100%)",
-                    }}
-                  >
-                    {state.selectedIcons.map((iconId) => (
-                      <img
-                        key={iconId}
-                        src={state.getIconUrl(iconId, 24)}
-                        alt={iconId.split(":")[1] ?? iconId}
-                        className="size-6 shrink-0 rounded"
-                        width={16}
-                        height={16}
-                      />
-                    ))}
-                  </div>
-                </div>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="shrink-0 text-muted-foreground hover:text-foreground"
-                  onClick={() => state.setSelectedIcons([])}
-                >
-                  Clear all
-                </Button>
-              </div>
-            )}
-          </DialogContent>
-        </Dialog>
+        <IconifySearchContext.Provider
+          value={{ disabled: disabled ?? false }}
+        >
+          <IconifySearchUI state={state} open={open} setOpen={setOpen} />
+        </IconifySearchContext.Provider>
       )}
     </IconifySearchPrimitive>
   );

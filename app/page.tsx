@@ -1,19 +1,19 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { OpenInV0Button } from "@/components/open-in-v0-button"
-import { IconifySearch } from "@/registry/new-york/blocks/iconify-search/iconify-search"
+import * as React from "react";
+import { OpenInV0Button } from "@/components/open-in-v0-button";
+import { IconifySearch } from "@/registry/new-york/blocks/iconify-search/iconify-search";
 
 export default function Home() {
-  const [singleValue, setSingleValue] = React.useState<string[]>([])
-  const [singleQuery, setSingleQuery] = React.useState("")
-  const [multipleValue, setMultipleValue] = React.useState<string[]>([])
-  const [multipleQuery, setMultipleQuery] = React.useState("")
+  const [singleValue, setSingleValue] = React.useState<string[]>([]);
+  const [singleQuery, setSingleQuery] = React.useState("");
+  const [multipleValue, setMultipleValue] = React.useState<string[]>([]);
+  const [multipleQuery, setMultipleQuery] = React.useState("");
 
   const debug = {
     single: { value: singleValue, searchQuery: singleQuery },
     multiple: { value: multipleValue, searchQuery: multipleQuery },
-  }
+  };
 
   return (
     <div className="max-w-3xl mx-auto flex flex-col min-h-svh px-4 py-8 gap-8">
@@ -67,5 +67,5 @@ export default function Home() {
         </div>
       </main>
     </div>
-  )
+  );
 }
